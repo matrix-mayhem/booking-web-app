@@ -1,0 +1,39 @@
+name: CI/CD for Fitness App
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name fitnessregistry
+
+      - name: Build & Push Docker Image
+        run: |
+          docker build -t fitnessregistry.azurecr.io/fitness-app:${{ github.sha }} .
+          docker push fitnessregistry.azurecr.io/fitness-app:${{ github.sha }}
+
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: fitness-aks
+          resource-group: fitness-rg
+
+      - name: Deploy to AKS
+        run: |
+          sed -i "s|fitnessregistry.azurecr.io/fitness-app:latest|fitnessregistry.azurecr.io/fitness-app:${{ github.sha }}|" k8s/deployment.yaml
+          kubectl apply -f k8s/
