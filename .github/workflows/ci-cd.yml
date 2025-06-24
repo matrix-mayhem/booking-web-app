@@ -35,5 +35,5 @@ jobs:
 
       - name: Deploy to AKS
         run: |
-          sed -i "s|fitnessregistry.azurecr.io/fitness-app:latest|fitnessregistry.azurecr.io/fitness-app:${{ github.sha }}|" k8s/deployment.yaml
+          sed -i "s|fitnessregistry.azurecr.io/fitness-app:latest|fitnessregistry.azurecr.io/fitness-app:${{ github.sha }}|" k8s/deployment.yml
           kubectl apply -f k8s/
