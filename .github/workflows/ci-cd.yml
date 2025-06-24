@@ -30,8 +30,8 @@ jobs:
         uses: azure/aks-set-context@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster-name: fitness-aks
-          resource-group: fitness-rg
+          cluster-name: AKSCICD
+          resource-group: openai
 
       - name: Deploy to AKS
         run: |
